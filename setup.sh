@@ -1,51 +1,70 @@
 #!/bin/sh
 
+# Function to display yellow text
+yellow() {
+    echo "$(tput setaf 3)$1$(tput sgr0)"
+}
+
+# Function to create a pause for 5 seconds
+pause() {
+    sleep 5
+}
+
 # Prompt the user to enter their desired username and password
-echo "Enter your desired username:"
+yellow "Enter your desired username:"
 read username
-echo "Enter a password for the user:"
+yellow "Enter a password for the user:"
 read -s password
 
-#Basically we shouldn't be running dashy as root although you could if you wanted to
-echo "Creating user $username..."
+# Create user
+yellow "Creating user $username..."
 addgroup -S "$username" && adduser -S "$username" -G "$username" -h /home/"$username" -s /bin/bash
 echo "$username:$password" | chpasswd
+pause
 
-#Packages...
-echo "Installing required packages..."
+# Install required packages
+yellow "Installing required packages..."
 apk add bash nano
 apk update && apk upgrade
+pause
 
-#Default terminal sucks, so we are gonna make it look more appealing
-echo "Setting up terminal environment..."
+# Set up terminal environment
+yellow "Setting up terminal environment..."
 ln -s /etc/profile.d/color_prompt.sh.disabled /etc/profile.d/color_prompt.sh
 export TERM=linux
 sh -c "echo 'TERM=linux' >> ~/.profile"
+pause
 
-#More packages...
-echo "Installing additional dependencies..."
+# Install additional dependencies
+yellow "Installing additional dependencies..."
 apk add git net-tools curl wget
 apk add --update nodejs=16.20.2-r0
 apk add yarn
+pause
 
-#Time to clone the official dashy repo!
-echo "Cloning Dashy repository..."
+# Clone Dashy repository
+yellow "Cloning Dashy repository..."
 git clone https://github.com/Lissy93/dashy.git /home/"$username"/dashy
+pause
 
-#self explanatory (assuming you will be using the newly created user)
-echo "Changing ownership of Dashy directory and its contents..."
+# Change ownership of Dashy directory and its contents
+yellow "Changing ownership of Dashy directory and its contents..."
 chown -R "$username":"$username" /home/"$username"/dashy
 cd /home/"$username"/dashy/
+pause
 
-
-echo "Creating logs directory..."
+# Create logs directory
+yellow "Creating logs directory..."
 mkdir -p logs/build logs/start
+pause
 
-#yarn build
-echo "Building the project..."
+# Build the project
+yellow "Building the project..."
 yarn build
+pause
 
-#we want dashy running in the background so heres a little init.d script, it'll automatically start everytime you boot up your alpine instance
+# Create init.d script for Dashy service
+yellow "Creating init.d script for Dashy service..."
 cat << EOF > /etc/init.d/dashy
 #!/sbin/openrc-run
 
@@ -69,7 +88,7 @@ start_pre() {
     ebegin "Building Dashy!"
     cd "\$directory"
     yarn build > "\$build_log" 2>&1
-    if [ -s "\$built_log" ]; then
+    if [ -s "\$build_log" ]; then
         last_line=\$(tail -n 1 "\$build_log")
         einfo "Dashy has been built! \$last_line"
     else
@@ -90,15 +109,22 @@ start() {
     fi
 }
 EOF
+pause
 
+# Make init.d script executable
+yellow "Making init.d script executable..."
 chmod +x /etc/init.d/dashy
-echo "Adding dashy service to boot..."
+pause
+
+# Add Dashy service to boot
+yellow "Adding Dashy service to boot..."
 rc-update add dashy boot
+pause
 
-#start the service using rc-service dashy start
-echo "Starting dashy service..."
+# Start Dashy service
+yellow "Starting Dashy service..."
 rc-service dashy start
+pause
 
-current_user=$(whoami)
-echo "Dashy is running under user: $current_user"
-
+# Display current user
+yellow "Dashy is running under user: $username"
