@@ -25,7 +25,7 @@ read -s password
 
 # Create user
 yellow "Creating user $username..."
-addgroup "$username" && adduser -S "$username" -G "$username" -h /home/"$username"
+addgroup "$username" && adduser "$username" -G "$username" -h /home/"$username"
 echo "$username:$password" | chpasswd
 
 # Install required packages
@@ -52,15 +52,12 @@ yellow "Cloning Dashy repository..."
 git clone https://github.com/Lissy93/dashy.git /home/"$username"/dashy
 pause
 
-# Create logs directory
-yellow "Creating logs directory..."
-mkdir -p /home/"$username"/dashy/logs/build /home/"$username"/dashy/logs/start
-pause
-
-# Change ownership of Dashy directory and its contents
-yellow "Changing ownership of Dashy directory and its contents..."
-chown -R "$username":"$username" /home/"$username"/dashy
+# Create logs directory and change ownership
+yellow "Creating logs directory and changing ownership..."
+mkdir -p /home/"$username"/dashy/logs/build /home/"$username"/dashy/logs/start && \
+chown -R "$username":"$username" /home/"$username"/dashy/
 cd /home/"$username"/dashy/
+pause
 
 # Build the project
 yellow "Building the project..."
