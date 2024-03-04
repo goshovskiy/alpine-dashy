@@ -30,8 +30,8 @@ echo "$username:$password" | chpasswd
 
 # Install required packages
 yellow "Installing required packages..."
-apk add nano
 apk update && apk upgrade
+apk add nano
 pause
 
 # Set up terminal environment
@@ -55,7 +55,7 @@ pause
 
 # Create logs directory
 yellow "Creating logs directory..."
-mkdir -p logs/build logs/start
+mkdir -p /home/"$username"/dashy/logs/build /home/"$username"/dashy/logs/start
 pause
 
 # Change ownership of Dashy directory and its contents
@@ -67,7 +67,6 @@ pause
 # Build the project
 yellow "Building the project..."
 yarn build
-pause
 
 # Create init.d script for Dashy service
 yellow "Creating init.d script for Dashy service..."
