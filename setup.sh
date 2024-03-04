@@ -2,8 +2,12 @@
 
 # Function to display yellow text
 yellow() {
-    echo "$(tput setaf 3)$1$(tput sgr0)"
+    printf "${YELLOW}$1${NC}\n"
 }
+
+# ANSI color codes
+YELLOW='\033[1;33m' # Yellow
+NC='\033[0m' # No Color
 
 # Function to create a pause for 5 seconds
 pause() {
