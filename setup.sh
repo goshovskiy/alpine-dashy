@@ -59,6 +59,7 @@ chown -R "$username":"$username" /home/"$username"/dashy/
 cd /home/"$username"/dashy/
 pause
 
+yarn
 # Build the project
 yellow "Building the project..."
 yarn build
