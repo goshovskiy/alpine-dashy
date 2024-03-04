@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/ash
+
+
+clear
 
 # Function to display yellow text
 yellow() {
@@ -22,13 +25,12 @@ read -s password
 
 # Create user
 yellow "Creating user $username..."
-addgroup -S "$username" && adduser -S "$username" -G "$username" -h /home/"$username" -s /bin/bash
+addgroup -S "$username" && adduser -S "$username" -G "$username" -h /home/"$username"
 echo "$username:$password" | chpasswd
-pause
 
 # Install required packages
 yellow "Installing required packages..."
-apk add bash nano
+apk add nano
 apk update && apk upgrade
 pause
 
@@ -51,15 +53,15 @@ yellow "Cloning Dashy repository..."
 git clone https://github.com/Lissy93/dashy.git /home/"$username"/dashy
 pause
 
+# Create logs directory
+yellow "Creating logs directory..."
+mkdir -p logs/build logs/start
+pause
+
 # Change ownership of Dashy directory and its contents
 yellow "Changing ownership of Dashy directory and its contents..."
 chown -R "$username":"$username" /home/"$username"/dashy
 cd /home/"$username"/dashy/
-pause
-
-# Create logs directory
-yellow "Creating logs directory..."
-mkdir -p logs/build logs/start
 pause
 
 # Build the project
