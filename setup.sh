@@ -39,15 +39,14 @@ cd /home/"$username"/dashy/
 
 
 echo "Creating logs directory..."
-mkdir -p logs/build logs/start logs/error
+mkdir -p logs/build logs/start
 
 #yarn build
 echo "Building the project..."
 yarn build
 
 #we want dashy running in the background so heres a little init.d script, it'll automatically start everytime you boot up your alpine instance
-echo "Creating init.d script for Dashy!"
-cat << 'EOF' > /etc/init.d/dashy
+cat << EOF > /etc/init.d/dashy
 #!/sbin/openrc-run
 
 description="Running Dashy on system start"
@@ -57,10 +56,10 @@ pidfile="/var/run/dashy.pid"
 
 name="dashy"
 command_background="yes"
-timestamp=$(date +"%Y-%m-%d-%H-%M-%S")
-build_log="/home/$username/dashy/logs/build/${name}-build-${timestamp}.log"
-start_log="/home/$username/dashy/logs/start/${name}-start-${timestamp}.log"
-host=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+timestamp=\$(date +"%Y-%m-%d-%H-%M-%S")
+build_log="\$directory/logs/build/\${name}-build-\${timestamp}.log"
+start_log="\$directory/logs/start/\${name}-start-\${timestamp}.log"
+host=\$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1')
 
 depend() {
     need net
@@ -68,11 +67,11 @@ depend() {
 
 start_pre() {
     ebegin "Building Dashy!"
-    cd "$directory"
-    yarn build > "$build_log" 2>&1
-    if [ -s "$build_log" ]; then
-        last_line=$(tail -n 1 "$build_log")
-        einfo "Dashy has been built! $last_line"
+    cd "\$directory"
+    yarn build > "\$build_log" 2>&1
+    if [ -s "\$built_log" ]; then
+        last_line=\$(tail -n 1 "\$build_log")
+        einfo "Dashy has been built! \$last_line"
     else
         ewarn "Failed to build Dashy."
     fi
@@ -80,12 +79,12 @@ start_pre() {
 
 start() {
     ebegin "Starting Dashy!"
-    nohup yarn start > "$start_log" 2>&1 &
-    echo $! > "$pidfile"
+    nohup yarn start > "\$start_log" 2>&1 &
+    echo \$! > "\$pidfile"
     sleep 5
     # Check if the line starting with "Your new" exists in the start_log file
-    if grep -q "Your new dashboard" "$start_log"; then
-        einfo "Your new dashboard is now up and running at $host"
+    if grep -q "Your new dashboard" "\$start_log"; then
+        einfo "Your new dashboard is now up and running at \$host"
     else
         ewarn "Dashy has errors or failed to start. See Logs."
     fi
