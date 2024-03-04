@@ -25,13 +25,19 @@ read -s password
 
 # Create user
 yellow "Creating user $username..."
-addgroup -S "$username" && adduser -S "$username" -G "$username" -h /home/"$username"
+addgroup "$username" && adduser -S "$username" -G "$username" -h /home/"$username"
 echo "$username:$password" | chpasswd
 
 # Install required packages
 yellow "Installing required packages..."
 apk update && apk upgrade
 apk add nano
+
+# Install additional dependencies
+yellow "Installing additional dependencies..."
+apk add git net-tools curl wget
+apk add --update nodejs=16.20.2-r0
+apk add yarn
 pause
 
 # Set up terminal environment
@@ -39,13 +45,6 @@ yellow "Setting up terminal environment..."
 ln -s /etc/profile.d/color_prompt.sh.disabled /etc/profile.d/color_prompt.sh
 export TERM=linux
 sh -c "echo 'TERM=linux' >> ~/.profile"
-pause
-
-# Install additional dependencies
-yellow "Installing additional dependencies..."
-apk add git net-tools curl wget
-apk add --update nodejs=16.20.2-r0
-apk add yarn
 pause
 
 # Clone Dashy repository
@@ -62,7 +61,6 @@ pause
 yellow "Changing ownership of Dashy directory and its contents..."
 chown -R "$username":"$username" /home/"$username"/dashy
 cd /home/"$username"/dashy/
-pause
 
 # Build the project
 yellow "Building the project..."
